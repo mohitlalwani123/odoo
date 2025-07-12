@@ -59,11 +59,12 @@ def questions(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = QuestionSerializer(data=request.data)
+        serializer = QuestionSerializer(data=request.data, context={'request': request})  # ✅ pass context
         if serializer.is_valid():
-            serializer.save(author=request.user)
+            serializer.save()  # ✅ no need to pass author here now
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class QuestionListCreateView(generics.ListCreateAPIView):
     queryset = Question.objects.all().order_by('-created_at')

@@ -29,11 +29,13 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
-        question = Question.objects.create(**validated_data)
+        author = self.context['request'].user  # ✅ get author from context
+        question = Question.objects.create(author=author, **validated_data)
         for tag_data in tags_data:
             tag, _ = Tag.objects.get_or_create(name=tag_data['name'])
             question.tags.add(tag)
         return question
+
     
 class AnswerSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
